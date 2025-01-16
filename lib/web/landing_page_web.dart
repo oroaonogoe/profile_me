@@ -23,6 +23,13 @@ class _LandingPageWebState extends State<LandingPageWeb> {
           color: Colors.black,
         ),
       ),
+      body: CircleAvatar(
+        radius: 103.0,
+        child: CircleAvatar(
+          radius: 100,
+          backgroundImage: AssetImage("assets/image-circle.png"),
+        ),
+      ),
     );
   }
 }
