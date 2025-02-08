@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:profile_me/components.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LandingPageWeb extends StatefulWidget {
   const LandingPageWeb({super.key});
@@ -9,12 +11,54 @@ class LandingPageWeb extends StatefulWidget {
 }
 
 class _LandingPageWebState extends State<LandingPageWeb> {
+  IconButton urlLauncher(String imagePath, String url) {
+    return IconButton(
+      icon: SvgPicture.asset(
+        imagePath,
+        width: 35,
+        colorFilter: ColorFilter.mode(Colors.black, BlendMode.modulate),
+      ),
+      onPressed: () async {
+        await launchUrl(Uri.parse(url));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var deviceHeight = MediaQuery.of(context).size.height;
     var deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      drawer: Drawer(),
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 72,
+              backgroundColor: Colors.tealAccent,
+              child: CircleAvatar(
+                radius: 70,
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage("assets/image.png"),
+              ),
+            ),
+            SizedBox(height: 15),
+            SansBold(text: "Your Name", size: 30),
+            SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                urlLauncher("assets/instagram.svg",
+                    "https://www.instagram.com/tomcruise/"),
+                urlLauncher(
+                    "assets/twitter.svg", "https://www.twitter.com/tomcruise"),
+                urlLauncher("assets/github.svg", "https://www.github.com/"),
+              ],
+            )
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Row(
