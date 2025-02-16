@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TabsWeb extends StatefulWidget {
-  const TabsWeb({super.key, required this.title});
+  const TabsWeb({super.key, required this.title, required this.route});
 
   final String title;
+  final String route;
 
   @override
   State<TabsWeb> createState() => _TabsWebState();
@@ -15,39 +18,76 @@ class _TabsWebState extends State<TabsWeb> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) {
-        setState(() {
-          isSelected = true;
-        });
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(widget.route);
       },
-      onExit: (_) {
-        setState(() {
-          isSelected = false;
-        });
+      child: MouseRegion(
+        onEnter: (_) {
+          setState(() {
+            isSelected = true;
+          });
+        },
+        onExit: (_) {
+          setState(() {
+            isSelected = false;
+          });
+        },
+        child: AnimatedDefaultTextStyle(
+          duration: Duration(milliseconds: 100),
+          curve: Curves.elasticIn,
+          style: isSelected
+              ? GoogleFonts.roboto(
+                  shadows: [
+                    Shadow(
+                      color: Colors.black,
+                      offset: Offset(0, -8),
+                    ),
+                  ],
+                  color: Colors.transparent,
+                  fontSize: 25.0,
+                  decoration: TextDecoration.underline,
+                  decorationThickness: 2,
+                  decorationColor: Colors.tealAccent,
+                )
+              : GoogleFonts.roboto(
+                  color: Colors.black,
+                  fontSize: 20.0,
+                ),
+          child: Text(widget.title),
+        ),
+      ),
+    );
+  }
+}
+
+class TabsMobile extends StatefulWidget {
+  const TabsMobile({super.key, required this.text, required this.route});
+
+  final String text;
+  final String route;
+
+  @override
+  State<TabsMobile> createState() => _TabsMobileState();
+}
+
+class _TabsMobileState extends State<TabsMobile> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      onPressed: () {
+        Navigator.of(context).pushNamed(widget.route);
       },
-      child: AnimatedDefaultTextStyle(
-        duration: Duration(milliseconds: 100),
-        curve: Curves.elasticIn,
-        style: isSelected
-            ? GoogleFonts.roboto(
-                shadows: [
-                  Shadow(
-                    color: Colors.black,
-                    offset: Offset(0, -8),
-                  ),
-                ],
-                color: Colors.transparent,
-                fontSize: 25.0,
-                decoration: TextDecoration.underline,
-                decorationThickness: 2,
-                decorationColor: Colors.tealAccent,
-              )
-            : GoogleFonts.roboto(
-                color: Colors.black,
-                fontSize: 20.0,
-              ),
-        child: Text(widget.title),
+      elevation: 20.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      height: 50.0,
+      minWidth: 200.0,
+      color: Colors.black,
+      child: Text(
+        widget.text,
+        style: GoogleFonts.openSans(fontSize: 20.0, color: Colors.white),
       ),
     );
   }
@@ -94,14 +134,14 @@ class Sans extends StatelessWidget {
 class TextForm extends StatelessWidget {
   const TextForm({
     super.key,
-    required this.heading,
-    required this.width,
+    required this.text,
+    required this.containerWidth,
     required this.hintText,
     this.maxLine,
   });
 
-  final String heading;
-  final double width;
+  final String text;
+  final double containerWidth;
   final String hintText;
   final int? maxLine;
 
@@ -110,12 +150,12 @@ class TextForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Sans(text: heading, size: 16.0),
+        Sans(text: text, size: 16.0),
         SizedBox(
           height: 5,
         ),
         SizedBox(
-          width: width,
+          width: containerWidth,
           child: TextFormField(
             maxLines: maxLine ?? maxLine,
             decoration: InputDecoration(
@@ -141,24 +181,28 @@ class TextForm extends StatelessWidget {
   }
 }
 
-class AnimatedCardWeb extends StatefulWidget {
-  const AnimatedCardWeb(
+class AnimatedCard extends StatefulWidget {
+  const AnimatedCard(
       {super.key,
       required this.imagePath,
-      required this.text,
+      this.text,
       this.fit,
-      this.reverse});
+      this.reverse,
+      this.height,
+      this.width});
 
-  final dynamic imagePath;
-  final dynamic text;
-  final dynamic fit;
-  final dynamic reverse;
+  final String imagePath;
+  final String? text;
+  final BoxFit? fit;
+  final bool? reverse;
+  final double? height;
+  final double? width;
 
   @override
-  State<AnimatedCardWeb> createState() => _AnimatedCardWebState();
+  State<AnimatedCard> createState() => _AnimatedCardState();
 }
 
-class _AnimatedCardWebState extends State<AnimatedCardWeb>
+class _AnimatedCardState extends State<AnimatedCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -181,9 +225,10 @@ class _AnimatedCardWebState extends State<AnimatedCardWeb>
     return SlideTransition(
       position: _animation,
       child: Card(
-        elevation: 30,
+        color: Colors.white,
+        elevation: 30.0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15.0),
           side: BorderSide(color: Colors.tealAccent),
         ),
         shadowColor: Colors.tealAccent,
@@ -194,14 +239,143 @@ class _AnimatedCardWebState extends State<AnimatedCardWeb>
             children: [
               Image.asset(
                 widget.imagePath,
-                width: 200,
-                height: 200,
+                width: widget.width ?? 200.0,
+                height: widget.height ?? 200.0,
                 fit: widget.fit,
               ),
               SizedBox(height: 10),
-              SansBold(text: widget.text, size: 15.0),
+              SansBold(size: 15.0, text: widget.text!),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+IconButton urlLauncher(String imagePath, String url) {
+  return IconButton(
+    icon: SvgPicture.asset(
+      imagePath,
+      width: 35,
+      colorFilter: ColorFilter.mode(Colors.black, BlendMode.modulate),
+    ),
+    onPressed: () async {
+      await launchUrl(Uri.parse(url));
+    },
+  );
+}
+
+Container tealContainer(String text) {
+  return Container(
+    decoration: BoxDecoration(
+      border: Border.all(
+        color: Colors.tealAccent,
+        style: BorderStyle.solid,
+        width: 2.0,
+      ),
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+    padding: EdgeInsets.all(7.0),
+    child: Text(text, style: GoogleFonts.openSans(fontSize: 15.0)),
+  );
+}
+
+class AbelCustom extends StatelessWidget {
+  const AbelCustom(
+      {super.key,
+      required this.text,
+      required this.size,
+      this.color,
+      this.fontWeight});
+  final dynamic text;
+  final dynamic size;
+  final dynamic color;
+  final dynamic fontWeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: GoogleFonts.abel(
+        fontSize: size,
+        color: color ?? Colors.black,
+        fontWeight: fontWeight ?? FontWeight.normal,
+      ),
+    );
+  }
+}
+
+class BlogPost extends StatefulWidget {
+  const BlogPost(
+      {super.key,
+      required this.left,
+      required this.right,
+      required this.top,
+      required this.all});
+  final double left;
+  final double right;
+  final double top;
+  final double all;
+
+  @override
+  State<BlogPost> createState() => _BlogPostState();
+}
+
+class _BlogPostState extends State<BlogPost> {
+  bool expand = false;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+          left: widget.left, right: widget.right, top: widget.top),
+      child: Container(
+        padding: EdgeInsets.all(widget.all),
+        decoration: BoxDecoration(
+          border: Border.all(
+            style: BorderStyle.solid,
+            width: 1.0,
+            color: Colors.black,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(3.0),
+                  ),
+                  child: AbelCustom(
+                    text: "Who is Dash",
+                    size: 25.0,
+                    color: Colors.white,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      expand = !expand;
+                    });
+                  },
+                  icon: Icon(Icons.arrow_drop_down_circle_outlined),
+                  color: Colors.black,
+                ),
+              ],
+            ),
+            SizedBox(height: 7.0),
+            Text(
+              "Introduction Dive into Flutter 3.29! This release refines development and boosts performance, with updates to Impeller, Cupertino, DevTools and more. With 104 unique authors contributing this release cycle, Flutter 3.29 showcases the community’s dedication. Let’s explore what’s new!  Cupertino, DevTools and more. With 104 unique authors contributing this release cycle, Flutter 3.29 showcases the community’s dedication. Let’s explore what’s new!",
+              style: GoogleFonts.openSans(fontSize: 15.0),
+              maxLines: expand == true ? null : 3,
+              overflow:
+                  expand == true ? TextOverflow.visible : TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

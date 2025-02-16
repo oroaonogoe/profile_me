@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:profile_me/components.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LandingPageWeb extends StatefulWidget {
   const LandingPageWeb({super.key});
@@ -11,19 +9,6 @@ class LandingPageWeb extends StatefulWidget {
 }
 
 class _LandingPageWebState extends State<LandingPageWeb> {
-  IconButton urlLauncher(String imagePath, String url) {
-    return IconButton(
-      icon: SvgPicture.asset(
-        imagePath,
-        width: 35,
-        colorFilter: ColorFilter.mode(Colors.black, BlendMode.modulate),
-      ),
-      onPressed: () async {
-        await launchUrl(Uri.parse(url));
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     var deviceHeight = MediaQuery.of(context).size.height;
@@ -66,15 +51,15 @@ class _LandingPageWebState extends State<LandingPageWeb> {
             Spacer(
               flex: 3,
             ),
-            TabsWeb(title: 'Home'),
+            TabsWeb(title: 'Home', route: "/",),
             Spacer(),
-            TabsWeb(title: 'Works'),
+            TabsWeb(title: 'Works', route: "/works",),
             Spacer(),
-            TabsWeb(title: 'Blog'),
+            TabsWeb(title: 'Blog', route: "/blog",),
             Spacer(),
-            TabsWeb(title: 'About'),
+            TabsWeb(title: 'About', route: "/about",),
             Spacer(),
-            TabsWeb(title: 'Contact'),
+            TabsWeb(title: 'Contact',route: "/contact",),
             Spacer(),
           ],
         ),
@@ -168,7 +153,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                   height: deviceHeight / 1.7,
                 ),
                 SizedBox(
-                  width: deviceWidth / 1.8,
+                  width: deviceWidth / 1.9,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,19 +254,19 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    AnimatedCardWeb(
+                    AnimatedCard(
                         imagePath: "assets/webL.png", text: "Web Development"),
-                    AnimatedCardWeb(
+                    AnimatedCard(
                       imagePath: "assets/app.png",
                       text: "App Development",
                       fit: BoxFit.contain,
                       reverse: true,
                     ),
-                    AnimatedCardWeb(
+                    AnimatedCard(
                         imagePath: "assets/firebase.png",
-                        text: "Back-end Development")
+                        text: "Back-end Development"),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -298,14 +283,14 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                     Column(
                       children: [
                         TextForm(
-                          width: 350,
-                          heading: "First name",
+                          containerWidth: 350,
+                          text: "First name",
                           hintText: "Please enter your first name",
                         ),
                         SizedBox(height: 15),
                         TextForm(
-                          heading: "Email",
-                          width: 350,
+                          text: "Email",
+                          containerWidth: 350,
                           hintText: "Please enter your email address",
                         ),
                       ],
@@ -313,14 +298,14 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                     Column(
                       children: [
                         TextForm(
-                          width: 350.0,
-                          heading: "Last name",
+                          containerWidth: 350.0,
+                          text: "Last name",
                           hintText: "Please enter your last name",
                         ),
                         SizedBox(height: 15.0),
                         TextForm(
-                          heading: "Phone",
-                          width: 350.0,
+                          text: "Phone",
+                          containerWidth: 350.0,
                           hintText: "Please enter your phone number",
                         ),
                       ],
@@ -328,11 +313,12 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                   ],
                 ),
                 TextForm(
-                  heading: "Message",
-                  width: deviceWidth / 1.5,
+                  text: "Message",
+                  containerWidth: deviceWidth / 1.5,
                   hintText: "Please enter your message",
                   maxLine: 10,
                 ),
+                SizedBox(height: 20.0),
                 MaterialButton(
                   onPressed: () {},
                   elevation: 20.0,
@@ -344,6 +330,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                   color: Colors.tealAccent,
                   child: SansBold(text: "Submit", size: 20.0),
                 ),
+                SizedBox(height: 10.0),
               ],
             ),
           ),
