@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:profile_me/components.dart';
 
 class BlogMobile extends StatefulWidget {
@@ -9,6 +11,34 @@ class BlogMobile extends StatefulWidget {
 }
 
 class _BlogMobileState extends State<BlogMobile> {
+  void article() async {
+    var logger = Logger();
+    await FirebaseFirestore.instance
+        .collection("articles")
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((element) {
+        logger.d(element.data()['title']);
+      });
+    });
+  }
+
+  void streamArticle() async {
+    var logger = Logger();
+    await for (var snapshot
+        in FirebaseFirestore.instance.collection("articles").snapshots()) {
+      for (var title in snapshot.docs.reversed) {
+        logger.d(title.data()['title']);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    streamArticle();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -86,13 +116,41 @@ class _BlogMobileState extends State<BlogMobile> {
               ),
             ];
           },
-          body: ListView(
-            children: [
-              BlogPost(left: 20.0, right: 20.0, top: 30.0,all: 10.0),
-              BlogPost(left: 20.0, right: 20.0, top: 30.0,all: 10.0),
-              BlogPost(left: 20.0, right: 20.0, top: 30.0,all: 10.0),
-            ],
-          ),
+          // body: ListView(
+          //   children: [
+          //     BlogPost(left: 20.0, right: 20.0, top: 30.0,all: 10.0),
+          //     BlogPost(left: 20.0, right: 20.0, top: 30.0,all: 10.0),
+          //     BlogPost(left: 20.0, right: 20.0, top: 30.0,all: 10.0),
+          //   ],
+          // ),
+          body: StreamBuilder<QuerySnapshot>(
+              stream:
+                  FirebaseFirestore.instance.collection("articles").orderBy("title", descending: false).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot documentSnapshot =
+                              snapshot.data!.docs[index];
+                          return BlogPost(
+                            left: 20.0,
+                            right: 20.0,
+                            top: 30.0,
+                            all: 10.0,
+                            title: documentSnapshot["title"],
+                            body: documentSnapshot["body"],
+                          );
+                        }),
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              }),
         ),
       ),
     );

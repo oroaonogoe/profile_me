@@ -74,52 +74,11 @@ class _ContactMobileState extends State<ContactMobile> {
         },
         body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 25.0),
-          child: Wrap(
-            runSpacing: 20.0,
-            spacing: 20.0,
-            alignment: WrapAlignment.center,
-            children: [
-              SansBold(text: "Contact me", size: 35.0),
-              TextForm(
-                text: "First Name",
-                containerWidth: widthdevice / 1.4,
-                hintText: "Please type first name",
-              ),
-              TextForm(
-                text: "Last Name",
-                containerWidth: widthdevice / 1.4,
-                hintText: "Please type last name",
-              ),
-              TextForm(
-                text: "Email Name",
-                containerWidth: widthdevice / 1.4,
-                hintText: "Please type email name",
-              ),
-              TextForm(
-                text: "Phone number",
-                containerWidth: widthdevice / 1.4,
-                hintText: "Please type phone number",
-              ),
-              TextForm(
-                text: "Message",
-                containerWidth: widthdevice / 1.4,
-                hintText: "Please type Message",
-                maxLine: 10,
-              ),
-              MaterialButton(
-                onPressed: () {},
-                elevation: 20.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                height: 16.0,
-                minWidth: widthdevice / 2.2,
-                color: Colors.tealAccent,
-                child: SansBold(text: "Submit", size: 20.0),
-              ),
-            ],
-          ),
+          child: ContactMeMobile(widthdevice: widthdevice),
         ),
       ),
     );
   }
 }
+
+

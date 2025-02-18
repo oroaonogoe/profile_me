@@ -1,7 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+var logger = Logger();
+
+final TextEditingController _firstNameController = TextEditingController();
+
+final TextEditingController _lastNameController = TextEditingController();
+
+final TextEditingController _emailController = TextEditingController();
+
+final TextEditingController _phoneController = TextEditingController();
+
+final TextEditingController _messageController = TextEditingController();
+
+final formKey = GlobalKey<FormState>();
 
 class TabsWeb extends StatefulWidget {
   const TabsWeb({super.key, required this.title, required this.route});
@@ -138,12 +154,16 @@ class TextForm extends StatelessWidget {
     required this.containerWidth,
     required this.hintText,
     this.maxLine,
+    required this.controller,
+    required this.validator,
   });
 
   final String text;
   final double containerWidth;
   final String hintText;
   final int? maxLine;
+  final TextEditingController controller;
+  final FormFieldValidator validator;
 
   @override
   Widget build(BuildContext context) {
@@ -157,8 +177,14 @@ class TextForm extends StatelessWidget {
         SizedBox(
           width: containerWidth,
           child: TextFormField(
+            validator: validator,
+            controller: controller,
             maxLines: maxLine ?? maxLine,
             decoration: InputDecoration(
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                borderSide: BorderSide(color: Colors.red),
+              ),
               focusedErrorBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.red),
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -288,6 +314,7 @@ class AbelCustom extends StatelessWidget {
       required this.size,
       this.color,
       this.fontWeight});
+
   final dynamic text;
   final dynamic size;
   final dynamic color;
@@ -312,11 +339,16 @@ class BlogPost extends StatefulWidget {
       required this.left,
       required this.right,
       required this.top,
-      required this.all});
+      required this.all,
+      required this.title,
+      required this.body});
+
   final double left;
   final double right;
   final double top;
   final double all;
+  final String title;
+  final String body;
 
   @override
   State<BlogPost> createState() => _BlogPostState();
@@ -324,6 +356,7 @@ class BlogPost extends StatefulWidget {
 
 class _BlogPostState extends State<BlogPost> {
   bool expand = false;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -351,7 +384,7 @@ class _BlogPostState extends State<BlogPost> {
                     borderRadius: BorderRadius.circular(3.0),
                   ),
                   child: AbelCustom(
-                    text: "Who is Dash",
+                    text: widget.title,
                     size: 25.0,
                     color: Colors.white,
                   ),
@@ -369,7 +402,7 @@ class _BlogPostState extends State<BlogPost> {
             ),
             SizedBox(height: 7.0),
             Text(
-              "Introduction Dive into Flutter 3.29! This release refines development and boosts performance, with updates to Impeller, Cupertino, DevTools and more. With 104 unique authors contributing this release cycle, Flutter 3.29 showcases the community’s dedication. Let’s explore what’s new!  Cupertino, DevTools and more. With 104 unique authors contributing this release cycle, Flutter 3.29 showcases the community’s dedication. Let’s explore what’s new!",
+              widget.body,
               style: GoogleFonts.openSans(fontSize: 15.0),
               maxLines: expand == true ? null : 3,
               overflow:
@@ -379,5 +412,274 @@ class _BlogPostState extends State<BlogPost> {
         ),
       ),
     );
+  }
+}
+
+class ContactMe extends StatelessWidget {
+  const ContactMe({
+    super.key,
+    required this.deviceWidth,
+  });
+
+  final double deviceWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  TextForm(
+                    containerWidth: 350,
+                    text: "First name",
+                    hintText: "Please enter your first name",
+                    controller: _firstNameController,
+                    validator: (text) {
+                      if (text.toString().isEmpty) {
+                        return "First name is required.";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15),
+                  TextForm(
+                    text: "Email",
+                    containerWidth: 350,
+                    hintText: "Please enter your email address",
+                    controller: _emailController,
+                    validator: (text) {
+                      if (text.toString().isEmpty) {
+                        return "Email is required.";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  TextForm(
+                    containerWidth: 350.0,
+                    text: "Last name",
+                    hintText: "Please enter your last name",
+                    controller: _lastNameController,
+                    validator: (text) {
+                      if (text.toString().isEmpty) {
+                        return "Last name is required.";
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 15.0),
+                  TextForm(
+                    text: "Phone",
+                    containerWidth: 350.0,
+                    hintText: "Please enter your phone number",
+                    controller: _phoneController,
+                    validator: (text) {
+                      if (text.toString().isEmpty) {
+                        return "Phone number is required.";
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          TextForm(
+            text: "Message",
+            containerWidth: deviceWidth / 1.5,
+            hintText: "Please enter your message",
+            maxLine: 10,
+            controller: _messageController,
+            validator: (text) {
+              if (text.toString().isEmpty) {
+                return "Please leave a message";
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 20.0),
+          MaterialButton(
+            onPressed: () async {
+              logger.d(_firstNameController.text);
+              final addData = AddDataFireStore();
+              if (formKey.currentState!.validate()) {
+                await addData.addResponse(
+                    _firstNameController.text,
+                    _lastNameController.text,
+                    _emailController.text,
+                    _phoneController.text,
+                    _messageController.text);
+                formKey.currentState!.reset();
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      title: SansBold(text: "Message submitted", size: 20.0),
+                    ),
+                  );
+                }
+              }
+            },
+            elevation: 20.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            height: 60.0,
+            minWidth: 200.0,
+            color: Colors.tealAccent,
+            child: SansBold(text: "Submit", size: 20.0),
+          ),
+          SizedBox(height: 10.0),
+        ],
+      ),
+    );
+  }
+}
+
+class ContactMeMobile extends StatelessWidget {
+  const ContactMeMobile({
+    super.key,
+    required this.widthdevice,
+  });
+
+  final double widthdevice;
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Wrap(
+        runSpacing: 20.0,
+        spacing: 25.0,
+        alignment: WrapAlignment.center,
+        children: [
+          SansBold(text: "Contact me", size: 35.0),
+          TextForm(
+            text: "First Name",
+            containerWidth: widthdevice / 1.4,
+            hintText: "Please type first name",
+            controller: _firstNameController,
+            validator: (text) {
+              if (text.toString().isEmpty) {
+                return "First name is required.";
+              }
+              return null;
+            },
+          ),
+          TextForm(
+            text: "Last Name",
+            containerWidth: widthdevice / 1.4,
+            hintText: "Please type last name",
+            controller: _lastNameController,
+            validator: (text) {
+              if (text.toString().isEmpty) {
+                return "Last name is required.";
+              }
+              return null;
+            },
+          ),
+          TextForm(
+            text: "Email Name",
+            containerWidth: widthdevice / 1.4,
+            hintText: "Please type email name",
+            controller: _emailController,
+            validator: (text) {
+              if (text.toString().isEmpty) {
+                return "Email is required.";
+              }
+              return null;
+            },
+          ),
+          TextForm(
+            text: "Phone number",
+            containerWidth: widthdevice / 1.4,
+            hintText: "Please type phone number",
+            controller: _phoneController,
+            validator: (text) {
+              if (text.toString().isEmpty) {
+                return "Phone number is required.";
+              }
+              return null;
+            },
+          ),
+          TextForm(
+            text: "Message",
+            containerWidth: widthdevice / 1.4,
+            hintText: "Please type Message",
+            maxLine: 10,
+            controller: _messageController,
+            validator: (text) {
+              if (text.toString().isEmpty) {
+                return "Please leave a message";
+              }
+              return null;
+            },
+          ),
+          MaterialButton(
+            onPressed: () async {
+              logger.d(_firstNameController.text);
+              final addData = AddDataFireStore();
+              if (formKey.currentState!.validate()) {
+                await addData.addResponse(
+                    _firstNameController.text,
+                    _lastNameController.text,
+                    _emailController.text,
+                    _phoneController.text,
+                    _messageController.text);
+                formKey.currentState!.reset();
+                if (context.mounted) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      title: SansBold(text: "Message submitted", size: 20.0),
+                    ),
+                  );
+                }
+              }
+            },
+            elevation: 20.0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            height: 16.0,
+            minWidth: widthdevice / 2.2,
+            color: Colors.tealAccent,
+            child: SansBold(text: "Submit", size: 20.0),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AddDataFireStore {
+  CollectionReference response =
+      FirebaseFirestore.instance.collection('messages');
+
+  Future<void> addResponse(final firstName, final lastName, final email,
+      final phone, final messages) async {
+    return response
+        .add({
+          'first name': firstName,
+          'last name': lastName,
+          'email': email,
+          'phone': phone,
+          'messages': messages
+        })
+        .then(
+          (value) => logger.d("Success"),
+        )
+        .catchError((error) => logger.d(error));
   }
 }

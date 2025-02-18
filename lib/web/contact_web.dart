@@ -108,60 +108,7 @@ class _ContactWebState extends State<ContactWeb> {
                 size: 40.0,
               ),
               SizedBox(height: 20.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      TextForm(
-                        containerWidth: 350,
-                        text: "First name",
-                        hintText: "Please enter your first name",
-                      ),
-                      SizedBox(height: 15),
-                      TextForm(
-                        text: "Email",
-                        containerWidth: 350,
-                        hintText: "Please enter your email address",
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      TextForm(
-                        containerWidth: 350.0,
-                        text: "Last name",
-                        hintText: "Please enter your last name",
-                      ),
-                      SizedBox(height: 15.0),
-                      TextForm(
-                        text: "Phone",
-                        containerWidth: 350.0,
-                        hintText: "Please enter your phone number",
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              TextForm(
-                text: "Message",
-                containerWidth: deviceWidth / 1.5,
-                hintText: "Please enter your message",
-                maxLine: 10,
-              ),
-              SizedBox(height: 20.0),
-              MaterialButton(
-                onPressed: () {},
-                elevation: 20.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                height: 60.0,
-                minWidth: 200.0,
-                color: Colors.tealAccent,
-                child: SansBold(text: "Submit", size: 20.0),
-              ),
-              SizedBox(height: 10.0),
+              ContactMe(deviceWidth: deviceWidth),
             ],
           ),
         ),
@@ -169,3 +116,5 @@ class _ContactWebState extends State<ContactWeb> {
     );
   }
 }
+
+

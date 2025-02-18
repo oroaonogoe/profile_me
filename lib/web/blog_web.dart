@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:profile_me/components.dart';
 
@@ -85,13 +86,41 @@ class _BlogWebState extends State<BlogWeb> {
               ),
             ];
           },
-          body: ListView(
-            children: [
-              BlogPost(left: 70.0, right: 70.0, top: 40.0, all: 20.0),
-              BlogPost(left: 70.0, right: 70.0, top: 40.0, all: 20.0),
-              BlogPost(left: 70.0, right: 70.0, top: 40.0, all: 20.0),
-            ],
-          ),
+          // body: ListView(
+          //   children: [
+              // BlogPost(left: 70.0, right: 70.0, top: 40.0, all: 20.0),
+              // BlogPost(left: 70.0, right: 70.0, top: 40.0, all: 20.0),
+              // BlogPost(left: 70.0, right: 70.0, top: 40.0, all: 20.0),
+          //   ],
+          // ),
+          body: StreamBuilder<QuerySnapshot>(
+              stream:
+              FirebaseFirestore.instance.collection("articles").snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot documentSnapshot =
+                          snapshot.data!.docs[index];
+                          return BlogPost(
+                            left: 70.0,
+                            right: 70.0,
+                            top: 40.0,
+                            all: 20.0,
+                            title: documentSnapshot["title"],
+                            body: documentSnapshot["body"],
+                          );
+                        }),
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              }),
         ),
       ),
     );
