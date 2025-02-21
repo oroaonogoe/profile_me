@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:google_fonts/google_fonts.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -18,6 +19,8 @@ class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       return web;
+    } else {
+      GoogleFonts.config.allowRuntimeFetching = false;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:

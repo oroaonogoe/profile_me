@@ -630,22 +630,20 @@ class ContactMeMobile extends StatelessWidget {
               logger.d(_firstNameController.text);
               final addData = AddDataFireStore();
               if (formKey.currentState!.validate()) {
-                await addData.addResponse(
+                if (await addData.addResponse(
                     _firstNameController.text,
                     _lastNameController.text,
                     _emailController.text,
                     _phoneController.text,
-                    _messageController.text);
-                formKey.currentState!.reset();
-                if (context.mounted) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      title: SansBold(text: "Message submitted", size: 20.0),
-                    ),
-                  );
+                    _messageController.text)) {
+                  formKey.currentState!.reset();
+                  if (context.mounted) {
+                    dialogError(context, "Message sent successfully.");
+                  }
+                } else {
+                  if (context.mounted) {
+                    dialogError(context, "Message failed to sent.");
+                  }
                 }
               }
             },
@@ -667,19 +665,32 @@ class AddDataFireStore {
   CollectionReference response =
       FirebaseFirestore.instance.collection('messages');
 
-  Future<void> addResponse(final firstName, final lastName, final email,
+  Future<bool> addResponse(final firstName, final lastName, final email,
       final phone, final messages) async {
-    return response
-        .add({
-          'first name': firstName,
-          'last name': lastName,
-          'email': email,
-          'phone': phone,
-          'messages': messages
-        })
-        .then(
-          (value) => logger.d("Success"),
-        )
-        .catchError((error) => logger.d(error));
+    return response.add({
+      'first name': firstName,
+      'last name': lastName,
+      'email': email,
+      'phone': phone,
+      'messages': messages
+    }).then(
+      (value) {
+        logger.d("Success");
+        return true;
+      },
+    ).catchError((error) {
+      logger.d(error);
+      return true;
+    });
   }
+}
+
+Future dialogError(BuildContext context, String title) {
+  return showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      title: SansBold(text: title, size: 20.0),
+    ),
+  );
 }
